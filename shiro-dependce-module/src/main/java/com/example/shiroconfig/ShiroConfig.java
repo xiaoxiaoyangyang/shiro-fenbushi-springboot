@@ -31,7 +31,6 @@ public class ShiroConfig {
     public ShiroConfig(){
         System.out.println("ShiroConfig  init ....");
     }
-
     /**
      * shiro过滤器加入到spring的过滤器当中
      * @return
@@ -57,7 +56,6 @@ public class ShiroConfig {
         Map<String, Filter> filterMap = new HashMap<>();
         filterMap.put("jwt", new JWTFilter());
         shiroFilterFactoryBean.setFilters(filterMap);
-
         //拦截器.
         Map<String,String> filterChainDefinitionMap = new LinkedHashMap<String,String>();
         //配置退出过滤器,其中的具体的退出代码Shiro已经替我们实现了
@@ -65,8 +63,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/springfox-swagger-ui/**","anon");
         filterChainDefinitionMap.put("/v2/api-docs","anon");
         filterChainDefinitionMap.put("/swagger-ui.html","anon");
-
-        filterChainDefinitionMap.put("/user/mylogin","anon");
+        filterChainDefinitionMap.put("/401","anon");
         //<!-- 过滤链定义，从上向下顺序执行，一般将 /**放在最为下边 -->:这是一个坑呢，一不小心代码就不好使了;
         //<!-- authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问-->
         filterChainDefinitionMap.put("/**", "jwt");
@@ -77,7 +74,7 @@ public class ShiroConfig {
         // 登录成功后要跳转的链接
 //        shiroFilterFactoryBean.setSuccessUrl("/index");
         //未授权界面;
-        shiroFilterFactoryBean.setUnauthorizedUrl("/403");
+//        shiroFilterFactoryBean.setUnauthorizedUrl("/403");
 
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         return shiroFilterFactoryBean;
@@ -85,13 +82,13 @@ public class ShiroConfig {
     /*
      加密方式配置
     */
-    @Bean
-    public HashedCredentialsMatcher hashedCredentialsMatcher(){
-        HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
-        hashedCredentialsMatcher.setHashAlgorithmName("md5");//散列算法:这里使用MD5算法;
-        hashedCredentialsMatcher.setHashIterations(1024);//散列的次数，比如散列两次，相当于 md5(md5(""));
-        return hashedCredentialsMatcher;
-    }
+//    @Bean
+//    public HashedCredentialsMatcher hashedCredentialsMatcher(){
+//        HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
+//        hashedCredentialsMatcher.setHashAlgorithmName("md5");//散列算法:这里使用MD5算法;
+//        hashedCredentialsMatcher.setHashIterations(1024);//散列的次数，比如散列两次，相当于 md5(md5(""));
+//        return hashedCredentialsMatcher;
+//    }
 
     /*
       认证器配置
@@ -99,7 +96,7 @@ public class ShiroConfig {
     @Bean
     public AuthenAuthorRealm authenAuthorRealm(){
         AuthenAuthorRealm authenAuthorRealm = new AuthenAuthorRealm();
-        authenAuthorRealm.setCredentialsMatcher(hashedCredentialsMatcher());
+//        authenAuthorRealm.setCredentialsMatcher(hashedCredentialsMatcher());
         return authenAuthorRealm;
     }
 
