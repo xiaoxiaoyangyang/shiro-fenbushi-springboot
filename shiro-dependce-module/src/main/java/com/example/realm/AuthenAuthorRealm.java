@@ -7,6 +7,7 @@ import com.example.mapper.UserMapper;
 import com.example.utils.JWTToken;
 import com.example.utils.JWTUtil;
 import jdk.nashorn.internal.ir.debug.JSONWriter;
+import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -56,7 +57,7 @@ public class AuthenAuthorRealm extends AuthorizingRealm {
         List<String> list = permissionMapper.selectAllPermission(username);
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
         simpleAuthorizationInfo.addStringPermissions(list);
-        String sign = JWTUtil.sign(userBean.getName(), userBean.getPassword());
+        String sign = JWTUtil.sign(username, userBean.getPassword());
         redisTemplate.opsForValue().set(username,sign,30,TimeUnit.MINUTES);
         return simpleAuthorizationInfo;
     }
@@ -78,11 +79,12 @@ public class AuthenAuthorRealm extends AuthorizingRealm {
 
         String token = (String) authenticationToken.getCredentials();
         // 解密获得username，用于和数据库进行对比
+        //鉴权时先和redis中存的token进行比较
         String username = JWTUtil.getUsername(token);
-        if (username == null) {
+        String redisToken = redisTemplate.opsForValue().get(username);
+        if (username == null || !token.equals(redisToken)) {
             throw new AuthenticationException("token invalid");
         }
-
         userBean = userMapper.selectOne(username);
         if (userBean == null) {
             throw new AuthenticationException("User didn't existed!");

@@ -13,10 +13,4 @@
         select <include refid="user_sql"/>
         from user where name=#{username}
     </select>
-    <insert id="insert">
-        insert into user (name,password)
-        values (
-            #{name},#{password}
-        )
-    </insert>
 </mapper>

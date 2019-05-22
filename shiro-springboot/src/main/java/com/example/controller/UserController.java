@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: guozhiyang_vendor
@@ -34,6 +35,8 @@ public class UserController {
             Md5Hash omgg = new Md5Hash(user.getPassword(), "OMGG", 1024);
             map.put("token",JWTUtil.sign(user.getName(),omgg.toString()));
             map.put("message",null);
+            //登陆成功将username作为键token作为值传入redis中
+            redisTemplate.opsForValue().set(user.getName(),omgg.toString(),30,TimeUnit.MINUTES);
             return new ResponseEntity<>(map, HttpStatus.OK);
         }else{
             map.put("message","账号密码错误");
