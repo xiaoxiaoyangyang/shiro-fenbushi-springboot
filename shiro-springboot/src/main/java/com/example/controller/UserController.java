@@ -56,11 +56,4 @@ public class UserController {
         return new ResponseEntity<Map<String,String>>(map,HttpStatus.OK);
 
     }
-    @RequestMapping(path = "/401")
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ResponseEntity<Map<String, String>> unauthorized() {
-        Map<String, String> map = new HashMap<>();
-        map.put("noauthen","没有权限");
-        return new ResponseEntity<>(map,HttpStatus.OK);
-    }
 }

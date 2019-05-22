@@ -52,10 +52,10 @@ public class ShiroConfig {
         System.out.println("ShiroConfiguration.shirFilter()");
         ShiroFilterFactoryBean shiroFilterFactoryBean  = new ShiroFilterFactoryBean();
         // 必须设置 SecurityManager
-        shiroFilterFactoryBean.setSecurityManager(securityManager);
         Map<String, Filter> filterMap = new HashMap<>();
         filterMap.put("jwt", new JWTFilter());
         shiroFilterFactoryBean.setFilters(filterMap);
+        shiroFilterFactoryBean.setSecurityManager(securityManager);
         //拦截器.
         Map<String,String> filterChainDefinitionMap = new LinkedHashMap<String,String>();
         //配置退出过滤器,其中的具体的退出代码Shiro已经替我们实现了
@@ -63,7 +63,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/springfox-swagger-ui/**","anon");
         filterChainDefinitionMap.put("/v2/api-docs","anon");
         filterChainDefinitionMap.put("/swagger-ui.html","anon");
-        filterChainDefinitionMap.put("/401","anon");
+//        filterChainDefinitionMap.put("/401","anon");
         //<!-- 过滤链定义，从上向下顺序执行，一般将 /**放在最为下边 -->:这是一个坑呢，一不小心代码就不好使了;
         //<!-- authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问-->
         filterChainDefinitionMap.put("/**", "jwt");
