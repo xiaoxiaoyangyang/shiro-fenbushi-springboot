@@ -33,10 +33,11 @@ public class UserController {
         Map<String, String> map = new HashMap<>(16);
         if(b){
             Md5Hash omgg = new Md5Hash(user.getPassword(), "OMGG", 1024);
-            map.put("token",JWTUtil.sign(user.getName(),omgg.toString()));
+            String sign = JWTUtil.sign(user.getName(), omgg.toString());
+            map.put("token",sign);
             map.put("message",null);
             //登陆成功将username作为键token作为值传入redis中
-            redisTemplate.opsForValue().set(user.getName(),omgg.toString(),30,TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set(user.getName(),sign,30,TimeUnit.MINUTES);
             return new ResponseEntity<>(map, HttpStatus.OK);
         }else{
             map.put("message","账号密码错误");

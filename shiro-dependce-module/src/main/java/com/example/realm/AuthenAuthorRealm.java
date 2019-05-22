@@ -58,7 +58,7 @@ public class AuthenAuthorRealm extends AuthorizingRealm {
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
         simpleAuthorizationInfo.addStringPermissions(list);
         String sign = JWTUtil.sign(username, userBean.getPassword());
-        redisTemplate.opsForValue().set(username,sign,30,TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(username,sign,5,TimeUnit.MINUTES);
         return simpleAuthorizationInfo;
     }
 
