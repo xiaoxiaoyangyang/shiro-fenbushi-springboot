@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
  */
 @RestController
 public class UserController {
-    //这是我用来测试版本回滚的
     @Autowired
     private UserService userService;
     @Autowired

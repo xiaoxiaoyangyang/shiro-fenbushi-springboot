@@ -1,0 +1,15 @@
+com\example\utils\JWTUtil.class
+com\example\entity\User.class
+com\example\mapper\PermissionMapper.class
+com\example\exception\ExceptionBody$ExceptionBodyBuilder.class
+com\example\exception\ExceptionBody.class
+com\example\exception\ExceptionEnum.class
+com\example\annotation\ShiroAnnotation.class
+com\example\config\WebConfig.class
+com\example\utils\JWTFilter.class
+com\example\config\RedisConfig.class
+com\example\realm\AuthenAuthorRealm.class
+com\example\shiroconfig\ShiroConfig.class
+com\example\mapper\UserMapper.class
+com\example\exception\GlobalExceptionAdvice.class
+com\example\utils\JWTToken.class
