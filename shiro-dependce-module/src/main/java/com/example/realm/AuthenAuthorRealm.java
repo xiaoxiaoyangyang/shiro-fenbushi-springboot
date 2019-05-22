@@ -1,10 +1,12 @@
 package com.example.realm;
 
+import com.alibaba.fastjson.JSON;
 import com.example.entity.User;
 import com.example.mapper.PermissionMapper;
 import com.example.mapper.UserMapper;
 import com.example.utils.JWTToken;
 import com.example.utils.JWTUtil;
+import jdk.nashorn.internal.ir.debug.JSONWriter;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -15,8 +17,10 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 集成了jwt的realm源
@@ -25,10 +29,13 @@ import java.util.List;
  * @Version 1.0
  */
 public class AuthenAuthorRealm extends AuthorizingRealm {
+    public static User userBean;
     @Autowired
     private PermissionMapper permissionMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private RedisTemplate<String,String> redisTemplate;
     /**
      * 大坑！，必须重写此方法，不然Shiro会报错
      */
@@ -49,6 +56,8 @@ public class AuthenAuthorRealm extends AuthorizingRealm {
         List<String> list = permissionMapper.selectAllPermission(username);
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
         simpleAuthorizationInfo.addStringPermissions(list);
+        String sign = JWTUtil.sign(userBean.getName(), userBean.getPassword());
+        redisTemplate.opsForValue().set(username,sign,30,TimeUnit.MINUTES);
         return simpleAuthorizationInfo;
     }
 
@@ -74,7 +83,7 @@ public class AuthenAuthorRealm extends AuthorizingRealm {
             throw new AuthenticationException("token invalid");
         }
 
-        User userBean = userMapper.selectOne(username);
+        userBean = userMapper.selectOne(username);
         if (userBean == null) {
             throw new AuthenticationException("User didn't existed!");
         }

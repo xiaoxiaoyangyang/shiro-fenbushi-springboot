@@ -1,6 +1,7 @@
 package com.example.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class GlobalExceptionAdvice {
     @Autowired
     private HttpServletRequest request;
 
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<?> handlerOpenDoorException(AuthenticationException openDoorException){
         ExceptionBody build = ExceptionBody.builder().path(request.getRequestURI())
@@ -33,12 +34,22 @@ public class GlobalExceptionAdvice {
         return new ResponseEntity<>(build,HttpStatus.BAD_REQUEST);
     }
 
+//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(ShiroException.class)
+    public ResponseEntity<?> handleShiroException(ShiroException ex){
+        ExceptionBody build = ExceptionBody.builder().path(request.getRequestURI())
+                .code(String.valueOf(HttpStatus.UNAUTHORIZED.value()))
+                .message(ex.getMessage())
+                .method(request.getMethod()).build();
+        return new ResponseEntity<>(build,HttpStatus.UNAUTHORIZED);
+    }
+
     /**
      * 服务内部错误时所
      * @param ex
      * @return
      */
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception ex){
         log.info("错误信息详情:------------>{}",ex.getMessage());

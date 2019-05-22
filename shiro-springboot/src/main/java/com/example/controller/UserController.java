@@ -6,6 +6,7 @@ import com.example.utils.JWTUtil;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +23,13 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private RedisTemplate<String,String> redisTemplate;
 
     @GetMapping("/user/mylogin")
     public ResponseEntity<Map<String, String>> login(@ModelAttribute User user){
         boolean b = userService.selectOne(user.getName(), user.getPassword());
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>(16);
         if(b){
             Md5Hash omgg = new Md5Hash(user.getPassword(), "OMGG", 1024);
             map.put("token",JWTUtil.sign(user.getName(),omgg.toString()));
@@ -40,9 +43,13 @@ public class UserController {
     }
     @RequiresPermissions("/user/add")
     @PostMapping("/user/add")
-    public ResponseEntity<Integer> add(@RequestBody User user){
-        Integer insert = userService.insert(user);
-        return new ResponseEntity<Integer>(insert,HttpStatus.OK);
+    public ResponseEntity<Map<String, String>> add(@RequestBody User user,@RequestHeader("Authorization")String token){
+        userService.insert(user);
+        String username = JWTUtil.getUsername(token);
+        String s = redisTemplate.opsForValue().get(username);
+        Map<String,String> map=new HashMap<String,String>(16);
+        map.put("Authorization",s);
+        return new ResponseEntity<Map<String,String>>(map,HttpStatus.OK);
 
     }
     @RequestMapping(path = "/401")
